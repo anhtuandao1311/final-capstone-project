@@ -1,18 +1,14 @@
 import { Navigate, Outlet, useRoutes } from 'react-router-dom'
-import ProductList from './pages/ProductList'
-import Login from './pages/Login'
-import Register from './pages/Register'
-import RegisterLayout from './layouts/RegisterLayout'
-import MainLayout from './layouts/MainLayout'
-import Profile from './pages/Profile'
+import path from './constants/path'
 import { useContext } from 'react'
 import { AppContext } from './contexts/app.context'
-import path from './constants/paths'
-
-function ProtectedRoute() {
-  const { isAuthenticated } = useContext(AppContext)
-  return isAuthenticated ? <Outlet /> : <Navigate to='/login' />
-}
+import RegisterLayout from './layouts/RegisterLayout'
+import Login from './pages/Login'
+import Register from './pages/Register'
+import MainLayout from './layouts/MainLayout'
+import Landing from './pages/Landing'
+import CourseDetails from './pages/CourseDetails'
+import Search from './pages/Search'
 
 function RejectedRoute() {
   const { isAuthenticated } = useContext(AppContext)
@@ -26,23 +22,26 @@ export default function useRouteElements() {
       index: true,
       element: (
         <MainLayout>
-          <ProductList />
+          <Landing />
         </MainLayout>
       )
     },
     {
-      path: '',
-      element: <ProtectedRoute></ProtectedRoute>,
-      children: [
-        {
-          path: path.profile,
-          element: (
-            <MainLayout>
-              <Profile />
-            </MainLayout>
-          )
-        }
-      ]
+      path: path.courseDetails,
+      element: (
+        <MainLayout>
+          <CourseDetails />
+        </MainLayout>
+      )
+    },
+    {
+      path: path.search,
+      index: true,
+      element: (
+        <MainLayout>
+          <Search />
+        </MainLayout>
+      )
     },
     {
       path: '',
