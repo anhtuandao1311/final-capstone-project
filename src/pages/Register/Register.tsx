@@ -1,23 +1,57 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import registerImage from '~/assets/images/register_page.png'
 import path from '~/constants/path'
+import { UserLoginCredentialsDtos, UserLoginFormDtos } from '~/dtos/UserLoginCredentialsDto'
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { HttpErrorMessage } from '~/constants/httpErrorMessage.enum'
+import axios from 'axios';
 
 export default function Register() {
+  const [userLoginFormInfo, setUserLoginFormInfo] = useState<UserLoginFormDtos>({
+    password: '',
+    email: '',
+    name: '',
+    confirmPassword: ''
+  })
+
+  const {password, email, name, confirmPassword} = userLoginFormInfo;
+
+  const submitUserRegistrationFormHandler = async (e: any) => {
+    e.preventDefault();
+
+    if (password !== confirmPassword) {
+      return toast.error(HttpErrorMessage.UnmatchPasswordError, {
+        position: toast.POSITION.TOP_RIGHT
+      });
+    }
+
+    await axios.post<UserLoginCredentialsDtos>('/user/user_register', {
+      password,
+      email,
+      name,
+    })
+  }
+
   return (
-    <div>
       <div className='grid grid-cols-12'>
+        {/* <ToastContainer/> */}
         <div className='col-span-5 relative pt-[100%] w-full bg-[#EBEBFF]'>
           <img src={registerImage} alt='register' className='absolute top-0 left-0 w-full h-full object-cover' />
         </div>
         <div className='col-span-7 flex items-center justify-center flex-col py-10 px-48'>
           <h1 className='text-3xl font-bold mb-6'>Create your account</h1>
-          <form className='w-full'>
+          <form onSubmit={submitUserRegistrationFormHandler} className='w-full'>
             <div className='mb-6'>
               <label className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>Username</label>
               <input
                 type='text'
                 className='border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5'
                 placeholder='Username'
+                required
+                value={name}
+                onChange={(e) => setUserLoginFormInfo(prev => ({...prev, name: e.target.value}))}
               />
             </div>
 
@@ -27,6 +61,9 @@ export default function Register() {
                 type='text'
                 className=' border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5'
                 placeholder='Email'
+                required
+                value={email}
+                onChange={(e) => setUserLoginFormInfo(prev => ({...prev, email: e.target.value}))}
               />
             </div>
 
@@ -37,6 +74,9 @@ export default function Register() {
                   type='password'
                   className=' border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5'
                   placeholder='Password'
+                  required
+                  value={password}
+                  onChange={(e) => setUserLoginFormInfo(prev => ({...prev, password: e.target.value}))}
                 />
               </div>
               <div className='col-span-1'>
@@ -45,12 +85,15 @@ export default function Register() {
                   type='password'
                   className=' border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5'
                   placeholder='Confirm Password'
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setUserLoginFormInfo(prev => ({...prev, confirmPassword: e.target.value}))}
                 />
               </div>
             </div>
 
             <div className='mb-6 flex justify-end'>
-              <button className='py-2 px-6 flex items-center justify-center bg-primary text-white gap-1 rounded-sm'>
+              <button type="submit" className='py-2 px-6 flex items-center justify-center bg-primary text-white gap-1 rounded-sm'>
                 <span>Create Account</span>
                 <svg
                   xmlns='http://www.w3.org/2000/svg'
@@ -100,6 +143,5 @@ export default function Register() {
           </div>
         </div>
       </div>
-    </div>
   )
 }
