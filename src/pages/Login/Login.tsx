@@ -1,10 +1,29 @@
-import { Link } from 'react-router-dom'
-import loginImage from '~/assets/images/login_page.png'
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { UserLoginFormDtos } from '~/dtos/UserLoginCredentialsDto'
 import path from '~/constants/path'
+import loginImage from '~/assets/images/login_page.png'
+import axios from 'axios'
 
 export default function Login() {
+  const [userLoginFormInfo, setUserLoginFormInfo] = useState<UserLoginFormDtos>({
+    password: '',
+    email: ''
+  })
+  const navigate = useNavigate();
+
+  const {email, password} = userLoginFormInfo;
+
+
+  const submitLoginFormHandler = async (e: any) => {
+    e.preventDefault()
+
+    axios.post<UserLoginFormDtos>('/user/user_login', userLoginFormInfo);
+
+    navigate(path.home);
+  }
+
   return (
-    <div>
       <div className='grid grid-cols-12'>
         <div className='col-span-5 relative pt-[100%] w-full bg-[#EBEBFF]'>
           <img
@@ -15,13 +34,16 @@ export default function Login() {
         </div>
         <div className='col-span-7 flex items-center justify-center flex-col py-10 px-48'>
           <h1 className='text-3xl font-bold mb-6'>Log-in to your own account</h1>
-          <form className='w-full'>
+          <form onSubmit={submitLoginFormHandler} className='w-full'>
             <div className='mb-6'>
               <label className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>Username</label>
               <input
                 type='text'
                 className=' border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5'
-                placeholder='Username or Email'
+                placeholder='email'
+                required
+                onChange={(e)=>setUserLoginFormInfo(prev => ({...prev, email: e.target.value}))}
+                value={email}
               />
             </div>
 
@@ -31,11 +53,14 @@ export default function Login() {
                 type='password'
                 className=' border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5'
                 placeholder='Password'
+                required
+                onChange={(e)=>setUserLoginFormInfo(prev => ({...prev, password: e.target.value}))}
+                value={password}
               />
             </div>
 
             <div className='mb-6 flex justify-end'>
-              <button className='py-2 px-6 flex items-center justify-center bg-primary text-white gap-1 rounded-sm'>
+              <button type='submit' className='py-2 px-6 flex items-center justify-center bg-primary text-white gap-1 rounded-sm'>
                 <span>Sign In</span>
                 <svg
                   xmlns='http://www.w3.org/2000/svg'
@@ -85,6 +110,5 @@ export default function Login() {
           </div>
         </div>
       </div>
-    </div>
   )
 }

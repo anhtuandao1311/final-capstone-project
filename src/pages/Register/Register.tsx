@@ -1,22 +1,23 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import registerImage from '~/assets/images/register_page.png'
-import path from '~/constants/path'
-import { UserLoginCredentialsDtos, UserLoginFormDtos } from '~/dtos/UserLoginCredentialsDto'
+import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { HttpErrorMessage } from '~/constants/httpErrorMessage.enum'
+import { UserInfoDtos, UserRegisterFormDtos } from '~/dtos/UserLoginCredentialsDto'
+import path from '~/constants/path'
+import registerImage from '~/assets/images/register_page.png'
 import axios from 'axios';
 
 export default function Register() {
-  const [userLoginFormInfo, setUserLoginFormInfo] = useState<UserLoginFormDtos>({
+  const [userRegisterFormInfo, setUserRegisterFormInfo] = useState<UserRegisterFormDtos>({
     password: '',
     email: '',
     name: '',
     confirmPassword: ''
   })
+  const navigate = useNavigate();
 
-  const {password, email, name, confirmPassword} = userLoginFormInfo;
+  const {password, email, name, confirmPassword} = userRegisterFormInfo;
 
   const submitUserRegistrationFormHandler = async (e: any) => {
     e.preventDefault();
@@ -27,16 +28,17 @@ export default function Register() {
       });
     }
 
-    await axios.post<UserLoginCredentialsDtos>('/user/user_register', {
+    await axios.post<UserInfoDtos>('/user/user_register', {
       password,
       email,
       name,
     })
+
+    navigate(path.home);
   }
 
   return (
       <div className='grid grid-cols-12'>
-        {/* <ToastContainer/> */}
         <div className='col-span-5 relative pt-[100%] w-full bg-[#EBEBFF]'>
           <img src={registerImage} alt='register' className='absolute top-0 left-0 w-full h-full object-cover' />
         </div>
@@ -51,7 +53,7 @@ export default function Register() {
                 placeholder='Username'
                 required
                 value={name}
-                onChange={(e) => setUserLoginFormInfo(prev => ({...prev, name: e.target.value}))}
+                onChange={(e) => setUserRegisterFormInfo(prev => ({...prev, name: e.target.value}))}
               />
             </div>
 
@@ -63,7 +65,7 @@ export default function Register() {
                 placeholder='Email'
                 required
                 value={email}
-                onChange={(e) => setUserLoginFormInfo(prev => ({...prev, email: e.target.value}))}
+                onChange={(e) => setUserRegisterFormInfo(prev => ({...prev, email: e.target.value}))}
               />
             </div>
 
@@ -76,7 +78,7 @@ export default function Register() {
                   placeholder='Password'
                   required
                   value={password}
-                  onChange={(e) => setUserLoginFormInfo(prev => ({...prev, password: e.target.value}))}
+                  onChange={(e) => setUserRegisterFormInfo(prev => ({...prev, password: e.target.value}))}
                 />
               </div>
               <div className='col-span-1'>
@@ -87,7 +89,7 @@ export default function Register() {
                   placeholder='Confirm Password'
                   required
                   value={confirmPassword}
-                  onChange={(e) => setUserLoginFormInfo(prev => ({...prev, confirmPassword: e.target.value}))}
+                  onChange={(e) => setUserRegisterFormInfo(prev => ({...prev, confirmPassword: e.target.value}))}
                 />
               </div>
             </div>

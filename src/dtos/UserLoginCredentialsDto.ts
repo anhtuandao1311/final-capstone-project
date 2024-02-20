@@ -1,9 +1,12 @@
-export interface UserLoginCredentialsDtos {
+export interface UserInfoDtos extends UserLoginFormDtos {
     name: string;
-    password: string;
-    email: string;
 }
 
-export interface UserLoginFormDtos extends UserLoginCredentialsDtos {
+export interface UserRegisterFormDtos extends UserInfoDtos {
     confirmPassword: string;
+}
+
+export interface UserLoginFormDtos {
+    email: string;
+    password: string;
 }
