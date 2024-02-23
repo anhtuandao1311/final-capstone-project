@@ -15,10 +15,15 @@ export default function Login() {
   const {email, password} = userLoginFormInfo;
 
 
-  const submitLoginFormHandler = async (e: any) => {
+  const submitLoginFormHandler = async (e: React.SyntheticEvent) => {
     e.preventDefault()
 
-    axios.post<UserLoginFormDtos>('/user/user_login', userLoginFormInfo);
+    try {
+      await axios.post<UserLoginFormDtos>('/user/user_login', userLoginFormInfo);
+    } catch (e: any) {
+      alert(e.response.data.message);
+      return;
+    }
 
     navigate(path.home);
   }
@@ -36,7 +41,7 @@ export default function Login() {
           <h1 className='text-3xl font-bold mb-6'>Log-in to your own account</h1>
           <form onSubmit={submitLoginFormHandler} className='w-full'>
             <div className='mb-6'>
-              <label className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>Username</label>
+              <label className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>Email</label>
               <input
                 type='text'
                 className=' border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5'
