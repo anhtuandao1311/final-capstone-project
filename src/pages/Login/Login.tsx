@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { UserLoginFormDtos } from '~/dtos/UserLoginCredentialsDto'
+import { UserLoginFormDtos, AccessTokenDtos } from '~/dtos/UserLoginCredentialsDto'
+import { saveAccessTokenToLocalStorage } from '~/utils/auth'
 import path from '~/constants/path'
 import loginImage from '~/assets/images/login_page.png'
 import axios from 'axios'
@@ -19,13 +20,16 @@ export default function Login() {
     e.preventDefault()
 
     try {
-      await axios.post<UserLoginFormDtos>('/user/user_login', userLoginFormInfo);
+      const token = await axios.post<UserLoginFormDtos, AccessTokenDtos>('/user/user_login', userLoginFormInfo);
+  
+      saveAccessTokenToLocalStorage(token.data.access_token);
     } catch (e: any) {
       alert(e.response.data.message);
+      
       return;
     }
 
-    navigate(path.home);
+    navigate(path.dashboard);
   }
 
   return (
@@ -39,10 +43,11 @@ export default function Login() {
         </div>
         <div className='col-span-7 flex items-center justify-center flex-col py-10 px-48'>
           <h1 className='text-3xl font-bold mb-6'>Log-in to your own account</h1>
-          <form onSubmit={submitLoginFormHandler} className='w-full'>
+          <form name='login' onSubmit={submitLoginFormHandler} className='w-full'>
             <div className='mb-6'>
               <label className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>Email</label>
               <input
+                name='email'
                 type='text'
                 className=' border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5'
                 placeholder='email'
@@ -55,6 +60,7 @@ export default function Login() {
             <div className='mb-6'>
               <label className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>Password</label>
               <input
+                name='password'
                 type='password'
                 className=' border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5'
                 placeholder='Password'

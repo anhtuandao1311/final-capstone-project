@@ -3,10 +3,11 @@ import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { HttpErrorMessage } from '~/constants/httpErrorMessage.enum'
-import { UserInfoDtos, UserRegisterFormDtos } from '~/dtos/UserLoginCredentialsDto'
+import { AccessTokenDtos, UserInfoDtos, UserRegisterFormDtos } from '~/dtos/UserLoginCredentialsDto'
 import path from '~/constants/path'
 import registerImage from '~/assets/images/register_page.png'
 import axios from 'axios';
+import { saveAccessTokenToLocalStorage } from '~/utils/auth';
 
 export default function Register() {
   const [userRegisterFormInfo, setUserRegisterFormInfo] = useState<UserRegisterFormDtos>({
@@ -27,14 +28,21 @@ export default function Register() {
         position: toast.POSITION.TOP_RIGHT
       });
     }
+    try {
+      const token = await axios.post<UserInfoDtos, AccessTokenDtos>('/user/user_register', {
+        password,
+        email,
+        name,
+      })
+  
+      saveAccessTokenToLocalStorage(token.data.access_token);
+    } catch (e: any) {
+      alert((e.response.data.message));
 
-    await axios.post<UserInfoDtos>('/user/user_register', {
-      password,
-      email,
-      name,
-    })
+      return;
+    }
 
-    navigate(path.home);
+    navigate(path.dashboard);
   }
 
   return (
@@ -44,10 +52,11 @@ export default function Register() {
         </div>
         <div className='col-span-7 flex items-center justify-center flex-col py-10 px-48'>
           <h1 className='text-3xl font-bold mb-6'>Create your account</h1>
-          <form onSubmit={submitUserRegistrationFormHandler} className='w-full'>
+          <form name='register' onSubmit={submitUserRegistrationFormHandler} className='w-full'>
             <div className='mb-6'>
               <label className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>Username</label>
               <input
+                name='username'
                 type='text'
                 className='border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5'
                 placeholder='Username'
@@ -60,6 +69,7 @@ export default function Register() {
             <div className='mb-6'>
               <label className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>Email</label>
               <input
+                name='email'
                 type='text'
                 className=' border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5'
                 placeholder='Email'
@@ -73,6 +83,7 @@ export default function Register() {
               <div className='col-span-1'>
                 <label className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>Password</label>
                 <input
+                  name='password'
                   type='password'
                   className=' border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5'
                   placeholder='Password'
@@ -84,6 +95,7 @@ export default function Register() {
               <div className='col-span-1'>
                 <label className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>Confirm Password</label>
                 <input
+                  name='confirmPassword'
                   type='password'
                   className=' border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5'
                   placeholder='Confirm Password'

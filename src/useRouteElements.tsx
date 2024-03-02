@@ -12,11 +12,13 @@ import Search from './pages/Search'
 
 function RejectedRoute() {
   const { isAuthenticated } = useContext(AppContext)
-  return !isAuthenticated ? <Outlet /> : <Navigate to='/' />
+
+  return isAuthenticated ? <Outlet /> : <Navigate to='/login' />
 }
 
 export default function useRouteElements() {
   const routeElements = useRoutes([
+    // all public page should be defined here
     {
       path: path.home,
       index: true,
@@ -44,23 +46,30 @@ export default function useRouteElements() {
       )
     },
     {
-      path: '',
+      path: path.login,
+      element: (
+        <RegisterLayout>
+          <Login />
+        </RegisterLayout>
+      )
+    },
+    {
+      path: path.register,
+      element: (
+        <RegisterLayout>
+          <Register />
+        </RegisterLayout>
+      )
+    },
+    {
+      path: path.dashboard,
       element: <RejectedRoute></RejectedRoute>,
+      // all protected routes should be defined down here
       children: [
         {
-          path: path.login,
+          path: '',
           element: (
-            <RegisterLayout>
-              <Login />
-            </RegisterLayout>
-          )
-        },
-        {
-          path: path.register,
-          element: (
-            <RegisterLayout>
-              <Register />
-            </RegisterLayout>
+            <div>This is protected page</div>
           )
         }
       ]

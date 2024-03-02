@@ -10,3 +10,9 @@ export interface UserLoginFormDtos {
     email: string;
     password: string;
 }
+
+export interface AccessTokenDtos {
+    data: {
+        access_token: string;
+    }
+}
