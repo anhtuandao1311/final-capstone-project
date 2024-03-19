@@ -1,0 +1,40 @@
+import { Fragment, useRef } from 'react'
+import { toast } from 'react-toastify'
+
+interface Props {
+  onChange?: (file?: File) => void
+}
+
+export default function FileInput({ onChange }: Props) {
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const fileFromLocal = event.target.files?.[0]
+  }
+
+  const handleChooseFile = () => {
+    fileInputRef.current?.click()
+  }
+  return (
+    <Fragment>
+      <input
+        className='hidden'
+        type='file'
+        accept='.jpg,.jpeg,.png'
+        ref={fileInputRef}
+        onChange={onFileChange}
+        // de cho phep chon lai file da chon thi van trigger onChange
+        onClick={(event) => {
+          ;(event.target as any).value = null
+        }}
+      />
+      <button
+        className='flex h-10 items-center justify-end rounded-sm border bg-white px-6 text-sm text-gray-600 shadow-sm'
+        type='button'
+        onClick={handleChooseFile}
+      >
+        Upload File
+      </button>
+    </Fragment>
+  )
+}

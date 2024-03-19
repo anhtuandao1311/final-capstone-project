@@ -1,4 +1,6 @@
+import { Link } from 'react-router-dom'
 import trailer from '~/assets/images/trailer.png'
+import Course from '~/components/Course'
 
 export default function CourseDetails() {
   return (
@@ -17,7 +19,7 @@ export default function CourseDetails() {
                 <p className='text-gray-500 mb-2'>Created by:</p>
                 <p className='font-bold'>John Doe</p>
               </div>
-              <div className='flex gap-1'>
+              <div className='flex gap-1 items-center'>
                 {Array(5)
                   .fill(0)
                   .map((_, index) => (
@@ -36,14 +38,6 @@ export default function CourseDetails() {
                       />
                     </svg>
                   ))}
-                <svg enableBackground='new 0 0 15 15' viewBox='0 0 15 15' x={0} y={0} className='w-4 h-4 fill-primary'>
-                  <polygon
-                    points='7.5 .8 9.7 5.4 14.5 5.9 10.7 9.1 11.8 14.2 7.5 11.6 3.2 14.2 4.3 9.1 .5 5.9 5.3 5.4'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeMiterlimit={10}
-                  />
-                </svg>
                 5<p className='text-gray-500'> (451,444 Rating)</p>
               </div>
             </div>
@@ -373,6 +367,31 @@ export default function CourseDetails() {
             </div>
           </div>
         </div>
+      </div>
+      <div className='flex justify-between pt-20'>
+        <div className='font-bold text-3xl'>Related Courses</div>
+        <Link to='/search' className='text-primary flex items-center gap-2'>
+          View All
+          <span>
+            <svg
+              xmlns='http://www.w3.org/2000/svg'
+              fill='none'
+              viewBox='0 0 24 24'
+              strokeWidth={1.5}
+              stroke='currentColor'
+              className='w-6 h-6'
+            >
+              <path strokeLinecap='round' strokeLinejoin='round' d='M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3' />
+            </svg>
+          </span>
+        </Link>
+      </div>
+      <div className='grid grid-cols-5 gap-3 pt-10 pb-10'>
+        {Array(5)
+          .fill(0)
+          .map((_, index) => (
+            <Course key={index} />
+          ))}
       </div>
     </div>
   )

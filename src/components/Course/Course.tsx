@@ -2,9 +2,13 @@ import { Link } from 'react-router-dom'
 import path from '~/constants/path'
 import courseImage from '~/assets/images/course_image.png'
 
-export default function Course() {
+interface Props {
+  linkTo?: string
+}
+
+export default function Course({ linkTo }: Props) {
   return (
-    <Link to={path.courseDetails}>
+    <Link to={linkTo || path.courseDetails}>
       <div className='bg-white shadow-sm rounded-sm hover:translate-y-[-0.2rem] hover:shadow-md duration-100 transition-transform overflow-hidden border'>
         <div className='w-full pt-[100%] relative'>
           <img src={courseImage} alt='product' className='absolute top-0 left-0 w-full h-full object-cover' />
@@ -19,7 +23,7 @@ export default function Course() {
           </div>
           <hr className='mb-4' />
           <div className='flex justify-between'>
-            <div className='flex gap-1'>
+            <div className='flex gap-1 items-center'>
               <svg enableBackground='new 0 0 15 15' viewBox='0 0 15 15' x={0} y={0} className='w-4 h-4 fill-primary'>
                 <polygon
                   points='7.5 .8 9.7 5.4 14.5 5.9 10.7 9.1 11.8 14.2 7.5 11.6 3.2 14.2 4.3 9.1 .5 5.9 5.3 5.4'

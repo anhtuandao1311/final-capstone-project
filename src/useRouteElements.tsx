@@ -9,10 +9,24 @@ import MainLayout from './layouts/MainLayout'
 import Landing from './pages/Landing'
 import CourseDetails from './pages/CourseDetails'
 import Search from './pages/Search'
+import CourseVideo from '~/pages/CourseVideo'
+import Cart from '~/pages/Cart'
+import UserLayout from '~/layouts/UserLayout'
+import Dashboard from '~/pages/Dashboard'
+import CreateCourse from '~/pages/CreateCourse'
+import ManageCourse from '~/pages/ManageCourse'
+import EditCourse from '~/pages/EditCourse'
+
+const isAuthenticated = true
 
 function RejectedRoute() {
-  const { isAuthenticated } = useContext(AppContext)
+  // const { isAuthenticated } = useContext(AppContext)
 
+  return !isAuthenticated ? <Outlet /> : <Navigate to='/login' />
+}
+
+function ProtectedRoute() {
+  // const { isAuthenticated } = useContext(AppContext)
   return isAuthenticated ? <Outlet /> : <Navigate to='/login' />
 }
 
@@ -62,14 +76,56 @@ export default function useRouteElements() {
       )
     },
     {
-      path: path.dashboard,
-      element: <RejectedRoute></RejectedRoute>,
+      path: '',
+      element: <ProtectedRoute></ProtectedRoute>,
       // all protected routes should be defined down here
       children: [
         {
-          path: '',
+          path: path.courseVideo,
           element: (
-            <div>This is protected page</div>
+            <MainLayout>
+              <CourseVideo />
+            </MainLayout>
+          )
+        },
+        {
+          path: path.cart,
+          element: (
+            <MainLayout>
+              <Cart />
+            </MainLayout>
+          )
+        },
+        {
+          path: path.dashboard,
+          element: (
+            <UserLayout>
+              <Dashboard />
+            </UserLayout>
+          )
+        },
+        {
+          path: path.createCourse,
+          element: (
+            <UserLayout>
+              <CreateCourse />
+            </UserLayout>
+          )
+        },
+        {
+          path: path.manageCourses,
+          element: (
+            <UserLayout>
+              <ManageCourse />
+            </UserLayout>
+          )
+        },
+        {
+          path: path.editCourse,
+          element: (
+            <UserLayout>
+              <EditCourse />
+            </UserLayout>
           )
         }
       ]
