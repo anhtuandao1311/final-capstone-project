@@ -4,15 +4,48 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select'
 import { Input } from '~/components/ui/input'
 import { Textarea } from '~/components/ui/textarea'
-import videoImage from '~/assets/images/video.png'
 import thumbnailImage from '~/assets/images/thumbnail.png'
-import FileInput from '~/components/FileInput/FileInput'
+import axios from 'axios'
 
 export default function CreateCourse() {
   const form = useForm({})
 
-  function onSubmit(values: any) {
-    console.log(values)
+  const handleUploadFileCloudinary = async (trailerFile: File, thumbnailFile: File) => {
+    const uploadedFiles = [trailerFile, thumbnailFile]
+    let filePaths: string[] = [];
+
+    for (const file of uploadedFiles) {
+      const formBodyData = new FormData();
+
+      formBodyData.append("file", file)
+      formBodyData.append("upload_preset", `${process.env.REACT_APP_CLOUDINARY_PRESET}`)
+
+      await fetch(`${process.env.REACT_APP_CLOUDINARY_URL}`, {
+        method: 'POST',
+        body: formBodyData
+      })
+        .then(res=>res.json())
+        .then(data => {
+            filePaths.push(data.url)
+        })
+    }
+
+    return filePaths;
+  }
+
+  const onSubmit = async (values: any) => {
+    const {trailerFile, thumbnailFile, ...courseInformation} = values;
+    courseInformation.teacherInChargeIds = [1,2];
+
+    const filePaths = await handleUploadFileCloudinary(trailerFile, thumbnailFile);
+
+    courseInformation.trailerPath = filePaths[0];
+    courseInformation.thumbnailPath = filePaths[1];
+
+    console.log(courseInformation)
+
+    const course = await axios.post('/course/course_create', courseInformation);
+    console.log(course);
   }
 
   return (
@@ -64,8 +97,8 @@ export default function CreateCourse() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value='English'>English</SelectItem>
-                          <SelectItem value='Vietnamese'>Vietnamese</SelectItem>
+                          <SelectItem value='en'>English</SelectItem>
+                          <SelectItem value='vn'>Vietnamese</SelectItem>
                         </SelectContent>
                       </Select>
                     </FormControl>
@@ -111,9 +144,11 @@ export default function CreateCourse() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value='Beginner'>Beginner</SelectItem>
-                          <SelectItem value='Intermediate'>Intermediate</SelectItem>
-                          <SelectItem value='Advanced'>Advanced</SelectItem>
+                          <SelectItem value='ml'>Machine Learning</SelectItem>
+                          <SelectItem value='ai'>Artificial Inteligence</SelectItem>
+                          <SelectItem value='dl'>Deep Learning</SelectItem>
+                          <SelectItem value='dsc'>Data Science</SelectItem>
+                          <SelectItem value='cv'>Computer Vision</SelectItem>
                         </SelectContent>
                       </Select>
                     </FormControl>
@@ -123,32 +158,58 @@ export default function CreateCourse() {
               />
             </div>
             <div className='grid grid-cols-2 gap-5'>
-              <div>
-                <FormLabel>Course Thumbnail</FormLabel>
-                <div className='flex gap-5 mt-3'>
-                  <img src={thumbnailImage} alt='' className='' />
-                  <div className='flex flex-col items-center justify-around'>
-                    <p className='text-sm text-slate-400'>
-                      Upload your course Thumbnail here. Important guidelines: 1200x800 pixels or 12:8 Ratio. Supported
-                      format: .jpg, .jpeg, or .png
-                    </p>
-                    <FileInput />
-                  </div>
-                </div>
-              </div>
-              <div>
-                <FormLabel>Course Video</FormLabel>
-                <div className='flex gap-5 mt-3'>
-                  <img src={videoImage} alt='' />
-                  <div className='flex flex-col items-center justify-around'>
-                    <p className='text-sm text-slate-400'>
-                      Students who watch a well-made promo video are 5X more likely to enroll in your course. We've seen
-                      that statistic go up to 10X for exceptionally awesome videos.
-                    </p>
-                    <FileInput />
-                  </div>
-                </div>
-              </div>
+              <FormField 
+                control={form.control}
+                name='thumbnailFile'
+                render={({field: {value, onChange, ...field}})=> (
+                  <FormItem>
+                    <FormLabel>Course Thumbnail</FormLabel>
+                    <div className='flex gap-5 mt-3'>
+                      <img src={thumbnailImage} alt='' className='' />
+                      <div className='flex flex-col items-center justify-around'>
+                        <p className='text-sm text-slate-400'>
+                          Upload your course Thumbnail here. Important guidelines: 1200x800 pixels or 12:8 Ratio. Supported
+                          format: .jpg, .jpeg, or .png
+                        </p>
+                        <Input
+                          {...field}
+                          value={value?.fileName}
+                          onChange={(event) => {
+                            onChange(event.target.files?.[0]);
+                          }}
+                          type="file"
+                        />
+                      </div>
+                    </div>
+                  </FormItem>
+                )}
+              />
+              <FormField 
+                control={form.control}
+                name='trailerFile'
+                render={({field: {value, onChange, ...field}})=> (
+                  <FormItem>
+                    <FormLabel>Course Trailer</FormLabel>
+                    <div className='flex gap-5 mt-3'>
+                      <img src={thumbnailImage} alt='' className='' />
+                      <div className='flex flex-col items-center justify-around'>
+                        <p className='text-sm text-slate-400'>
+                          Upload your course Thumbnail here. Important guidelines: 1200x800 pixels or 12:8 Ratio. Supported
+                          format: .jpg, .jpeg, or .png
+                        </p>
+                        <Input
+                          {...field}
+                          value={value?.fileName}
+                          onChange={(event) => {
+                            onChange(event.target.files?.[0]);
+                          }}
+                          type="file"
+                        />
+                      </div>
+                    </div>
+                  </FormItem>
+                )}
+              />
             </div>
             <div>
               <FormLabel>Assign Instructor</FormLabel>

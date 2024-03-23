@@ -12,7 +12,7 @@ import { FormLabel } from '~/components/ui/form'
 import { Input } from '~/components/ui/input'
 
 import { Button } from '~/components/ui/button'
-import FileInput from '~/components/FileInput'
+// import FileInput from '~/components/FileInput'
 
 export default function EditCourse() {
   return (
@@ -171,7 +171,7 @@ export default function EditCourse() {
                         </DialogHeader>
                         <div className='flex'>
                           <Input placeholder='Upload file...' disabled className='flex-1'></Input>
-                          <FileInput />
+                          {/* <FileInput /> */}
                         </div>
                         <Button className='text-white'>Save changes</Button>
                       </DialogContent>

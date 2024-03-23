@@ -17,16 +17,8 @@ import CreateCourse from '~/pages/CreateCourse'
 import ManageCourse from '~/pages/ManageCourse'
 import EditCourse from '~/pages/EditCourse'
 
-const isAuthenticated = true
-
-function RejectedRoute() {
-  // const { isAuthenticated } = useContext(AppContext)
-
-  return !isAuthenticated ? <Outlet /> : <Navigate to='/login' />
-}
-
 function ProtectedRoute() {
-  // const { isAuthenticated } = useContext(AppContext)
+  const { isAuthenticated } = useContext(AppContext)
   return isAuthenticated ? <Outlet /> : <Navigate to='/login' />
 }
 
