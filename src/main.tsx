@@ -9,7 +9,7 @@ import { AppProvider } from './contexts/app.context.tsx'
 import { getAccessTokenFromLocalStorage } from './utils/auth.ts'
 import axios from 'axios';
 
-axios.defaults.baseURL = process.env.REACT_APP_BASE_URL;
+axios.defaults.baseURL = `${process.env.REACT_APP_BASE_URL}`;
 axios.defaults.headers.common['Authorization'] = `Bearer ${getAccessTokenFromLocalStorage()}`;
 
 const queryClient = new QueryClient({
