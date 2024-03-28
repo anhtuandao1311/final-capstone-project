@@ -10,6 +10,7 @@ export default function FileInput({ onChange }: Props) {
 
   const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const fileFromLocal = event.target.files?.[0]
+    onChange && onChange(fileFromLocal)
   }
 
   const handleChooseFile = () => {
@@ -23,18 +24,25 @@ export default function FileInput({ onChange }: Props) {
         accept='.jpg,.jpeg,.png'
         ref={fileInputRef}
         onChange={onFileChange}
-        // de cho phep chon lai file da chon thi van trigger onChange
         onClick={(event) => {
           ;(event.target as any).value = null
         }}
       />
-      <button
-        className='flex h-10 items-center justify-end rounded-sm border bg-white px-6 text-sm text-gray-600 shadow-sm'
-        type='button'
+      <svg
+        xmlns='http://www.w3.org/2000/svg'
+        fill='none'
+        viewBox='0 0 24 24'
+        strokeWidth={1.5}
+        stroke='currentColor'
+        className='w-6 h-6 cursor-pointer'
         onClick={handleChooseFile}
       >
-        Upload File
-      </button>
+        <path
+          strokeLinecap='round'
+          strokeLinejoin='round'
+          d='M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5'
+        />
+      </svg>
     </Fragment>
   )
 }

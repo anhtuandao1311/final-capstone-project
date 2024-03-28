@@ -1,7 +1,11 @@
+import { Fragment, useContext } from 'react'
 import { Link } from 'react-router-dom'
 import path from '~/constants/path'
+import { AppContext } from '~/contexts/app.context'
 
 export default function Header() {
+  const { isAuthenticated } = useContext(AppContext)
+
   return (
     <div>
       <div className='flex justify-between bg-[#1D2026] text-[#8C94A3]'>
@@ -106,18 +110,27 @@ export default function Header() {
             </svg>
           </Link>
         </div>
+        {!isAuthenticated ? (
+          <Fragment>
+            <div className='col-start-11 col-span-1 flex items-center'>
+              <Link to={path.register} className='text-primary font-bold'>
+                Create Account
+              </Link>
+            </div>
 
-        <div className='col-start-11 col-span-1 flex items-center'>
-          <Link to={path.register} className='text-primary font-bold'>
-            Create Account
-          </Link>
-        </div>
-
-        <div className='col-start-12 col-span-1 flex items-center justify-center'>
-          <Link to={path.login} className='py-3 px-6  font-bold bg-primary text-white'>
-            Sign In
-          </Link>
-        </div>
+            <div className='col-start-12 col-span-1 flex items-center justify-center'>
+              <Link to={path.login} className='py-3 px-6  font-bold bg-primary text-white'>
+                Sign In
+              </Link>
+            </div>
+          </Fragment>
+        ) : (
+          <div className='ml-12 col-start-12 flex items-center'>
+            <Link to={path.profile} className='text-primary font-bold'>
+              Profile
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   )

@@ -2,8 +2,28 @@ import { Link } from 'react-router-dom'
 import path from '~/constants/path'
 import landingImage from '~/assets/images/landing_page.png'
 import Course from '~/components/Course'
+import { useContext } from 'react'
+import { AppContext } from '~/contexts/app.context'
+import { useQuery } from '@tanstack/react-query'
+import courseApi from '~/apis/course.api'
 
 export default function Landing() {
+  const { isAuthenticated } = useContext(AppContext)
+
+  const { data: allCourses } = useQuery({
+    queryKey: ['courses'],
+    queryFn: courseApi.getCourses
+    // enabled: !isAuthenticated
+  })
+
+  // const { data: myCourses } = useQuery({
+  //   queryKey: ['myCourses'],
+  //   queryFn: courseApi.getStudentCourses,
+  //   enabled: isAuthenticated
+  // })
+
+  let courses = allCourses?.data
+
   return (
     <div>
       <div className='bg-slate-200 py-16'>
@@ -14,9 +34,15 @@ export default function Landing() {
               Our mision is to help people to find the best course online and learn with expert anytime, anywhere.
             </p>
             <div className='flex items-center'>
-              <Link to={path.register} className='py-3 px-6  font-bold bg-primary text-white'>
-                Create Account
-              </Link>
+              {!isAuthenticated ? (
+                <Link to={path.register} className='py-3 px-6  font-bold bg-primary text-white'>
+                  Create Account
+                </Link>
+              ) : (
+                <Link to={path.search} className='py-3 px-6 font-bold bg-primary text-white'>
+                  Browse Courses
+                </Link>
+              )}
             </div>
           </div>
           <div className='col-span-1 relative'>
@@ -25,13 +51,14 @@ export default function Landing() {
         </div>
       </div>
       <div className='container'>
-        <h1 className='font-bold text-5xl py-12 text-center'>Best selling courses</h1>
+        {!isAuthenticated ? (
+          <h1 className='font-bold text-5xl py-12 text-center'>Best Selling Courses</h1>
+        ) : (
+          <h1 className='font-bold text-5xl py-12 text-center'>My Courses</h1>
+        )}
+
         <div className='grid grid-cols-5 gap-3 mb-12'>
-          {Array(10)
-            .fill(0)
-            .map((_, index) => (
-              <Course key={index} />
-            ))}
+          {courses && courses.map((course) => <Course key={course.id} course={course} />)}
         </div>
       </div>
       <div className='bg-[#1D2026]'>

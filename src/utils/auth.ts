@@ -10,7 +10,7 @@ export const clearLocalStorage = () => {
 }
 
 export const getAccessTokenFromLocalStorage = () => {
-  return localStorage.getItem('access_token')
+  return localStorage.getItem('access_token') || ''
 }
 
 export const saveProfileToLocalStorage = (profile: User) => {

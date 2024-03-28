@@ -1,26 +1,73 @@
-import { Link } from 'react-router-dom'
-import trailer from '~/assets/images/trailer.png'
-import Course from '~/components/Course'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { useContext } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { toast } from 'react-toastify'
+import courseApi from '~/apis/course.api'
+import path from '~/constants/path'
+import { AppContext } from '~/contexts/app.context'
+import { Course as CourseType } from '~/types/course.type'
 
 export default function CourseDetails() {
+  const { isAuthenticated } = useContext(AppContext)
+
+  const { data } = useQuery({
+    queryKey: ['courses'],
+    queryFn: courseApi.getCourses,
+    enabled: !isAuthenticated
+  })
+
+  const { data: studentCourses } = useQuery({
+    queryKey: ['studentCourses'],
+    queryFn: courseApi.getStudentCourses,
+    enabled: isAuthenticated
+  })
+
+  const studentEnrollCourseMutation = useMutation({
+    mutationFn: courseApi.enrollCourse
+  })
+
+  const navigate = useNavigate()
+
+  const handleEnrollCourse = (courseId: number) => {
+    if (!isAuthenticated) return navigate('/login')
+    studentEnrollCourseMutation.mutate(
+      { courseId },
+      {
+        onSuccess: () => {
+          toast.success('Enrolled successfully', { autoClose: 2000 })
+        },
+        onError: (error) => {
+          toast.error('Failed to enroll in course', { autoClose: 2000 })
+        }
+      }
+    )
+  }
+
+  const { courseId } = useParams()
+  const courseIdNumber = Number(courseId)
+  const courses = data?.data
+  if (!courses || !studentCourses) return null
+
+  const isEnrolledCourse = studentCourses?.data.some((course: any) => course.course.id === courseIdNumber)
+
+  const course = courses.find((course: CourseType) => course.id === courseIdNumber)
+
   return (
     <div className='container py-6'>
       <div className='grid grid-cols-12 gap-3'>
         <div className='col-span-8'>
           <div className='flex flex-col gap-8 mb-8'>
-            <h1 className='font-bold text-3xl'>
-              Complete Website Responsive Design: from Figma to Webflow to Website Design
-            </h1>
-            <p className='text-gray-500'>
-              3 in 1 Course: Learn to design websites with Figma, build with Webflow, and make a living freelancing.
-            </p>
+            <h1 className='font-bold text-3xl'>{course?.title}</h1>
+
             <div className='flex items-center justify-between'>
               <div>
-                <p className='text-gray-500 mb-2'>Created by:</p>
-                <p className='font-bold'>John Doe</p>
+                {/* <p className='text-gray-500 mb-2'>Created by:</p>
+                <p className='font-bold'>John Doe</p> */}
+                <p className='text-gray-500 mb-2'>Level:</p>
+                <p className='font-bold uppercase text-primary'>{course?.level}</p>
               </div>
-              <div className='flex gap-1 items-center'>
-                {Array(5)
+              <div className='flex flex-col gap-1 items-start'>
+                {/* {Array(5)
                   .fill(0)
                   .map((_, index) => (
                     <svg
@@ -38,25 +85,23 @@ export default function CourseDetails() {
                       />
                     </svg>
                   ))}
-                5<p className='text-gray-500'> (451,444 Rating)</p>
+                5<p className='text-gray-500'> (451,444 Rating)</p> */}
+                <div>Language: </div>
+                <div className='uppercase font-bold text-primary'>{course?.language}</div>
               </div>
             </div>
           </div>
           <div className='mb-8'>
-            <img src={trailer} alt='trailer' />
+            <video controls className='w-full'>
+              <source src={course?.trailerPath} type='video/mp4' />
+              Your browser does not support the video tag.
+            </video>
+            {/* <ReactPlayer url={course?.trailerPath} controls width='100%' /> */}
           </div>
           <h2 className='font-bold text-2xl mb-8'>Description</h2>
-          <p className='text-gray-500 mb-8'>
-            It gives you a huge self-satisfaction when you look at your work and say, "I made this!". I love that
-            feeling after I'm done working on something. When I lean back in my chair, look at the final result with a
-            smile, and have this little "spark joy" moment. It's especially satisfying when I know I just made $5,000.
-          </p>
-          <p className='text-gray-500'>
-            I do! And that's why I got into this field. Not for the love of Web Design, which I do now. But for the
-            LIFESTYLE! There are many ways one can achieve this lifestyle. This is my way. This is how I achieved a
-            lifestyle I've been fantasizing about for f ive years. And I'm going to teach you the same.
-          </p>
-          <div className='bg-[#23BD33]/20 mt-8 mb-8 p-8'>
+          <p className='text-gray-500 mb-8 whitespace-pre-line'>{course?.description}</p>
+
+          {/* <div className='bg-[#23BD33]/20 mt-8 mb-8 p-8'>
             <h2 className='font-bold text-xl mb-6'>What you will learn in this course</h2>
             <div className='grid grid-cols-2 gap-4'>
               {Array(4)
@@ -94,11 +139,11 @@ export default function CourseDetails() {
                   Lorem ipsum dolor sit amet consectetur adipisicing elit. Praesentium illu
                 </li>
               ))}
-          </ul>
+          </ul> */}
         </div>
         <div className='col-span-4'>
           <div className='p-6 border border-gray-300'>
-            <div className='flex items-start justify-between mb-8'>
+            {/* <div className='flex items-start justify-between mb-8'>
               <div className='flex flex-col gap-3'>
                 <div className='flex items-center gap-2'>
                   <span className='text-xl '>$14.00</span>
@@ -124,7 +169,7 @@ export default function CourseDetails() {
               </div>
               <div className='text-primary font-bold'>56% OFF</div>
             </div>
-            <hr className='mb-8' />
+            <hr className='mb-8' /> */}
             <div className='flex flex-col gap-3 mb-8'>
               <div className='flex items-center justify-between'>
                 <div className='flex items-center gap-2'>
@@ -144,7 +189,7 @@ export default function CourseDetails() {
                   </svg>
                   Course Duration
                 </div>
-                <div className='text-gray-500'>6 Months</div>
+                <div className='text-gray-500'>~ 2 Months</div>
               </div>
 
               <div className='flex items-center justify-between'>
@@ -165,10 +210,10 @@ export default function CourseDetails() {
                   </svg>
                   Course Level
                 </div>
-                <div className='text-gray-500'>Beginner</div>
+                <div className='text-gray-500'>{course?.level}</div>
               </div>
 
-              <div className='flex items-center justify-between'>
+              {/* <div className='flex items-center justify-between'>
                 <div className='flex items-center gap-2'>
                   <svg
                     xmlns='http://www.w3.org/2000/svg'
@@ -187,7 +232,7 @@ export default function CourseDetails() {
                   Students Enrolled
                 </div>
                 <div className='text-gray-500'>69,419</div>
-              </div>
+              </div> */}
 
               <div className='flex items-center justify-between'>
                 <div className='flex items-center gap-2'>
@@ -207,7 +252,7 @@ export default function CourseDetails() {
                   </svg>
                   Language
                 </div>
-                <div className='text-gray-500'>English</div>
+                <div className='text-gray-500 uppercase'>{course?.language}</div>
               </div>
 
               <div className='flex items-center justify-between'>
@@ -228,15 +273,29 @@ export default function CourseDetails() {
                   </svg>
                   Subtittle Language
                 </div>
-                <div className='text-gray-500'>English</div>
+                <div className='text-gray-500 uppercase'>{course?.language}</div>
               </div>
             </div>
             <hr className='mb-8' />
-            <button className='py-4 px-8 text-white bg-primary w-full font-bold mb-8'>Add To Cart</button>
-            <div className='font-bold text-primary text-center mb-8'>Buy Now</div>
-            <button className='py-2 px-8  w-full font-bold text-gray-700 border border-gray-300 text-sm mb-8'>
+            {!isEnrolledCourse ? (
+              <button
+                onClick={() => handleEnrollCourse(course?.id as number)}
+                className='py-4 px-8 text-white bg-primary w-full font-bold mb-8'
+              >
+                Enroll Now
+              </button>
+            ) : (
+              <Link
+                to={`${path.home}${courseId}/videos`}
+                className='py-4 px-8 text-white bg-primary w-full font-bold mb-8 block text-center rounded-sm'
+              >
+                Learn Now
+              </Link>
+            )}
+
+            {/* <button className='py-2 px-8  w-full font-bold text-gray-700 border border-gray-300 text-sm mb-8'>
               Add To Wishlist
-            </button>
+            </button> */}
             <h1 className='text-gray-800 font-bold mb-8'>This course includes:</h1>
             <div className='flex flex-col gap-3 mb-8 text-gray-500 text-sm'>
               <div className='flex items-center gap-2'>
@@ -386,13 +445,13 @@ export default function CourseDetails() {
           </span>
         </Link>
       </div>
-      <div className='grid grid-cols-5 gap-3 pt-10 pb-10'>
+      {/* <div className='grid grid-cols-5 gap-3 pt-10 pb-10'>
         {Array(5)
           .fill(0)
           .map((_, index) => (
             <Course key={index} />
           ))}
-      </div>
+      </div> */}
     </div>
   )
 }

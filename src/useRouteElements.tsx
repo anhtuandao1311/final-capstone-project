@@ -22,6 +22,11 @@ function ProtectedRoute() {
   return isAuthenticated ? <Outlet /> : <Navigate to='/login' />
 }
 
+function RejectedRoute() {
+  const { isAuthenticated } = useContext(AppContext)
+  return !isAuthenticated ? <Outlet /> : <Navigate to='/' />
+}
+
 export default function useRouteElements() {
   const routeElements = useRoutes([
     // all public page should be defined here
@@ -118,6 +123,28 @@ export default function useRouteElements() {
             <UserLayout>
               <EditCourse />
             </UserLayout>
+          )
+        }
+      ]
+    },
+    {
+      path: '',
+      element: <RejectedRoute></RejectedRoute>,
+      children: [
+        {
+          path: path.login,
+          element: (
+            <RegisterLayout>
+              <Login />
+            </RegisterLayout>
+          )
+        },
+        {
+          path: path.register,
+          element: (
+            <RegisterLayout>
+              <Register />
+            </RegisterLayout>
           )
         }
       ]

@@ -7,10 +7,12 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { AppProvider } from './contexts/app.context.tsx'
 import { getAccessTokenFromLocalStorage } from './utils/auth.ts'
-import axios from 'axios';
+import axios from 'axios'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
-axios.defaults.baseURL = `${process.env.REACT_APP_BASE_URL}`;
-axios.defaults.headers.common['Authorization'] = `Bearer ${getAccessTokenFromLocalStorage()}`;
+axios.defaults.baseURL = `${process.env.REACT_APP_BASE_URL}`
+axios.defaults.headers.common['Authorization'] = `Bearer ${getAccessTokenFromLocalStorage()}`
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -26,6 +28,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <QueryClientProvider client={queryClient}>
         <AppProvider>
           <App />
+          <ToastContainer />
         </AppProvider>
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
